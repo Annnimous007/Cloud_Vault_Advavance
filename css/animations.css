@@ -1,0 +1,82 @@
+/* ═══════════════════════════════════════════════════════════
+   ANIMATIONS — Entry effects, hover states, transitions
+═══════════════════════════════════════════════════════════ */
+
+/* ── Card entrance ───────────────────────────────────────────── */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.file-card, .file-row {
+  animation: cardIn var(--dur-slow) var(--ease-out) both;
+}
+
+/* Stagger via nth-child */
+.file-card:nth-child(1),  .file-row:nth-child(1)  { animation-delay: 0ms; }
+.file-card:nth-child(2),  .file-row:nth-child(2)  { animation-delay: 40ms; }
+.file-card:nth-child(3),  .file-row:nth-child(3)  { animation-delay: 80ms; }
+.file-card:nth-child(4),  .file-row:nth-child(4)  { animation-delay: 120ms; }
+.file-card:nth-child(5),  .file-row:nth-child(5)  { animation-delay: 160ms; }
+.file-card:nth-child(6),  .file-row:nth-child(6)  { animation-delay: 200ms; }
+.file-card:nth-child(7),  .file-row:nth-child(7)  { animation-delay: 240ms; }
+.file-card:nth-child(8),  .file-row:nth-child(8)  { animation-delay: 280ms; }
+.file-card:nth-child(9),  .file-row:nth-child(9)  { animation-delay: 320ms; }
+.file-card:nth-child(10), .file-row:nth-child(10) { animation-delay: 360ms; }
+.file-card:nth-child(n+11), .file-row:nth-child(n+11) { animation-delay: 400ms; }
+
+/* ── Stat counter pulse ──────────────────────────────────────── */
+@keyframes countUp {
+  from { transform: translateY(6px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+.stat-number { animation: countUp 0.4s var(--ease-out); }
+
+/* ── Accent glow pulse on hover ──────────────────────────────── */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+  50%       { box-shadow: 0 0 0 6px transparent; }
+}
+
+/* ── Logo icon subtle float ──────────────────────────────────── */
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-2px); }
+}
+.logo-icon svg { animation: logoFloat 3s ease-in-out infinite; }
+
+/* ── Drop zone bounce ────────────────────────────────────────── */
+@keyframes dropBounce {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.02); }
+}
+.drop-zone.drag-over { animation: dropBounce 0.6s ease-in-out infinite; }
+
+/* ── Toast slide ─────────────────────────────────────────────── */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); max-height: 80px; margin-bottom: 0; }
+  to   { opacity: 0; transform: translateX(20px); max-height: 0; margin-bottom: -8px; }
+}
+
+/* ── Spinner ─────────────────────────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Theme fade ──────────────────────────────────────────────── */
+body, .sidebar, .topbar, .modal, .file-card, .stat-card {
+  transition-property: background, background-color, border-color, color, box-shadow;
+  transition-duration: var(--dur-slow);
+  transition-timing-function: var(--ease-out);
+}
+
+/* ── Reduced motion respect ──────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
