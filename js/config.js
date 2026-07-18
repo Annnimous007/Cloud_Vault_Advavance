@@ -11,8 +11,8 @@ const CONFIG = {
      Repo:  the repository name (where files live)
      Branch: usually 'main' or 'master'
   ──────────────────────────────────────────────────────────── */
-  GITHUB_OWNER:  'YOUR_GITHUB_USERNAME',   // e.g. 'johndoe'
-  GITHUB_REPO:   'YOUR_REPO_NAME',         // e.g. 'my-cloudvault'
+  GITHUB_OWNER:  'Annnimous007',   // e.g. 'johndoe'
+  GITHUB_REPO:   'Cloud_Vault_Advance',         // e.g. 'my-cloudvault'
   GITHUB_BRANCH: 'main',
 
   /* ── GitHub Personal Access Token ──────────────────────────
@@ -30,7 +30,7 @@ const CONFIG = {
          For personal/private repos this is acceptable for
          quick setup — rotate your token periodically.
   ──────────────────────────────────────────────────────────── */
-  GITHUB_TOKEN: '',   // e.g. 'ghp_xxxxxxxxxxxxxxxxxxxx'
+  GITHUB_TOKEN: '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',   // e.g. 'ghp_xxxxxxxxxxxxxxxxxxxx'
 
   /* ── Site settings ──────────────────────────────────────── */
   SITE_NAME:    'CloudVault',
