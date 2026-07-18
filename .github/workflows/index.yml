@@ -1,0 +1,64 @@
+name: Rebuild File Index
+
+on:
+  push:
+    paths:
+      - 'uploads/**'   # Triggers only when a file is added/removed in uploads/
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  index:
+    name: Generate uploads/index.json
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build file index
+        run: |
+          python3 - <<'PYEOF'
+          import os, json, mimetypes
+          from pathlib import Path
+          from datetime import datetime
+
+          UPLOADS = Path("uploads")
+          SKIP    = {".gitkeep", ".gitignore", "index.json"}
+          files   = []
+
+          for p in sorted(UPLOADS.rglob("*")):
+              if not p.is_file():
+                  continue
+              if p.name in SKIP:
+                  continue
+              rel  = str(p).replace("\\", "/")
+              size = p.stat().st_size
+              ext  = p.suffix.lstrip(".").lower()
+              cat  = p.parent.name
+
+              mime, _ = mimetypes.guess_type(str(p))
+              files.append({
+                  "name":      p.name,
+                  "path":      rel,
+                  "size":      size,
+                  "ext":       ext,
+                  "category":  cat,
+                  "mime":      mime or "application/octet-stream",
+                  "indexedAt": datetime.utcnow().isoformat() + "Z",
+              })
+
+          out = UPLOADS / "index.json"
+          out.write_text(json.dumps({"files": files, "count": len(files), "generated": datetime.utcnow().isoformat()+"Z"}, indent=2))
+          print(f"Indexed {len(files)} files → {out}")
+          PYEOF
+
+      - name: Commit index
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add uploads/index.json
+          git diff --staged --quiet || git commit -m "chore: update file index [skip ci]"
+          git push
