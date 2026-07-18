@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Setup Guide — CloudVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <style>
+    body { max-width: 760px; margin: 0 auto; padding: 0 20px 60px; }
+    .setup-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration:none; color: var(--text-primary); }
+    .logo-text { font-weight: 700; font-size: 1.1rem; background: linear-gradient(135deg,#818cf8,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 14px; text-decoration: none; }
+    .back-link:hover { color: var(--accent); text-decoration: none; }
+
+    .guide-title { font-size: 2rem; font-weight: 800; margin-bottom: 8px; background: linear-gradient(135deg,#818cf8,#a78bfa,#34d399); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .guide-subtitle { color: var(--text-secondary); margin-bottom: 40px; font-size: 1.05rem; }
+
+    .step { margin-bottom: 36px; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .step-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#8b5cf6); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .step-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+    .step-body { padding: 20px; background: var(--surface-1); }
+    .step-body p { color: var(--text-secondary); margin-bottom: 12px; line-height: 1.7; }
+    .step-body ol, .step-body ul { padding-left: 20px; display: list-item; color: var(--text-secondary); }
+    .step-body li { margin-bottom: 8px; display: list-item; list-style: decimal; line-height: 1.7; }
+    .step-body ul li { list-style: disc; }
+
+    pre.code-block {
+      background: var(--surface-3); border: 1px solid var(--border-md);
+      border-radius: 10px; padding: 16px; overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      color: var(--text-primary); line-height: 1.6; margin: 12px 0;
+      position: relative;
+    }
+    .copy-code-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: var(--surface-4); border: 1px solid var(--border); color: var(--text-secondary);
+      border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .copy-code-btn:hover { background: var(--accent); color: white; }
+
+    .highlight { color: #a78bfa; }
+    .comment   { color: #64748b; }
+    .string    { color: #34d399; }
+
+    .callout { display: flex; gap: 12px; padding: 14px 16px; border-radius: 10px; margin: 16px 0; font-size: 14px; }
+    .callout.info    { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25); }
+    .callout.warning { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25); }
+    .callout.success { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.25); }
+    .callout i { flex-shrink: 0; margin-top: 2px; }
+    .callout.info    i { color: #38bdf8; }
+    .callout.warning i { color: #fbbf24; }
+    .callout.success i { color: #34d399; }
+    .callout p { margin: 0; color: var(--text-secondary); }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace; vertical-align: middle; }
+    .badge.purple { background: rgba(99,102,241,0.15); color: #818cf8; }
+    .badge.green  { background: rgba(52,211,153,0.15); color: #34d399; }
+
+    .structure { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary); line-height: 2; padding: 16px; background: var(--surface-2); border-radius: 10px; border: 1px solid var(--border); }
+    .structure .folder { color: #818cf8; font-weight: 600; }
+    .structure .file   { color: var(--text-primary); }
+    .structure .note   { color: #64748b; }
+  </style>
+</head>
+<body>
+
+  <header class="setup-header">
+    <a href="index.html" class="logo">
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="url(#g1)"/><path d="M10 26C10 22.134 13.134 19 17 19C17.34 19 17.675 19.024 18 19.071C18.622 16.71 20.812 15 23.5 15C26.538 15 29 17.462 29 20.5C29 20.832 28.99 20.832 28.971 20.994C30.18 21.478 31 22.645 31 24C31 25.657 29.657 27 28 27H12C10.895 27 10 26.105 10 25V26Z" fill="white" opacity="0.9"/><path d="M20 22V30M20 30L17 27M20 30L23 27" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g1" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs></svg>
+      <span class="logo-text">CloudVault</span>
+    </a>
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back</a>
+  </header>
+
+  <h1 class="guide-title">Setup Guide</h1>
+  <p class="guide-subtitle">Get your personal CloudVault live on GitHub Pages in under 10 minutes.</p>
+
+  <!-- Step 1 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Fork or Clone the Repository</div>
+    </div>
+    <div class="step-body">
+      <p>Start by getting your own copy of CloudVault on GitHub.</p>
+      <ol>
+        <li>Go to the CloudVault GitHub repository.</li>
+        <li>Click <strong>Fork</strong> to create a copy under your account — or clone it and push to a new repo.</li>
+        <li>Name it something memorable, e.g. <code>my-cloudvault</code> or <code>files</code>.</li>
+      </ol>
+      <div class="callout info">
+        <i class="fa-solid fa-circle-info"></i>
+        <p>You can use either a public or private repository. Public repos mean your files are accessible to anyone with the link (great for sharing). Private repos require a token even for reading.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Enable GitHub Pages</div>
+    </div>
+    <div class="step-body">
+      <p>Turn on GitHub Pages to serve your CloudVault as a website.</p>
+      <ol>
+        <li>Open your repository on GitHub.</li>
+        <li>Go to <strong>Settings → Pages</strong>.</li>
+        <li>Under <strong>Source</strong>, select <code>Deploy from a branch</code>.</li>
+        <li>Choose branch <code>main</code>, folder <code>/ (root)</code>.</li>
+        <li>Click <strong>Save</strong>.</li>
+      </ol>
+      <p>Your site will be live at:</p>
+      <pre class="code-block">https://<span class="highlight">YOUR_USERNAME</span>.github.io/<span class="highlight">YOUR_REPO</span>/</pre>
+      <div class="callout success">
+        <i class="fa-solid fa-circle-check"></i>
+        <p>GitHub Pages is completely free for public repositories and also available on private repos with GitHub Pro, Team, or Enterprise plans.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Generate a GitHub Personal Access Token</div>
+    </div>
+    <div class="step-body">
+      <p>A token lets CloudVault upload files to your repo via the GitHub API.</p>
+      <ol>
+        <li>Go to <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">GitHub → Settings → Developer settings → Personal access tokens</a>.</li>
+        <li>Click <strong>Generate new token (classic)</strong>.</li>
+        <li>Give it a name like <code>cloudvault-upload</code>.</li>
+        <li>Set expiration to your comfort (90 days or No expiration).</li>
+        <li>Under scopes, check <strong><code>repo</code></strong> (full control of private repos) or <strong><code>public_repo</code></strong> for public repos.</li>
+        <li>Click <strong>Generate token</strong> and <strong>copy it immediately</strong> — you won't see it again!</li>
+      </ol>
+      <div class="callout warning">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p><strong>Security note:</strong> Never commit your token to a public repository. For production use, consider a serverless backend (Cloudflare Worker, Vercel Edge Function) that holds the token server-side and proxies uploads.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">Edit <code>js/config.js</code></div>
+    </div>
+    <div class="step-body">
+      <p>Open <code>js/config.js</code> in your repo and fill in your details. This is the <strong>only file you need to edit</strong>.</p>
+      <pre class="code-block"><span class="comment">// js/config.js</span>
+<span class="highlight">const</span> CONFIG = {
+  GITHUB_OWNER:  <span class="string">'your-github-username'</span>,
+  GITHUB_REPO:   <span class="string">'your-repo-name'</span>,
+  GITHUB_BRANCH: <span class="string">'main'</span>,
+  GITHUB_TOKEN:  <span class="string">'ghp_xxxxxxxxxxxxxxxxxxxx'</span>, <span class="comment">// your token</span>
+
+  DEMO_MODE: <span class="highlight">false</span>,  <span class="comment">// ← Set this to false!</span>
+
+  <span class="comment">// Optional: set if using a custom domain</span>
+  BASE_URL: <span class="string">''</span>,
+};</pre>
+      <div class="callout info">
+        <i class="fa-solid fa-circle-info"></i>
+        <p>Make sure to set <code>DEMO_MODE: false</code> — otherwise CloudVault will keep showing the sample files instead of your real files.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title">Add Files to Your Repository</div>
+    </div>
+    <div class="step-body">
+      <p>There are two ways to add files:</p>
+      <p><strong>Option A — Upload via CloudVault UI</strong> (recommended)</p>
+      <ul>
+        <li>Click the <strong>Upload</strong> button in the top bar.</li>
+        <li>Drag & drop files or browse your computer.</li>
+        <li>Select a category or let CloudVault auto-detect it.</li>
+        <li>Click <strong>Start Upload</strong> — files go directly to your GitHub repo!</li>
+      </ul>
+      <p style="margin-top:16px"><strong>Option B — Commit directly to GitHub</strong></p>
+      <ul>
+        <li>Place files in the <code>uploads/</code> folder in your repo.</li>
+        <li>Use the correct subfolder: <code>documents/</code>, <code>images/</code>, <code>videos/</code>, <code>audio/</code>, <code>archives/</code>, or <code>others/</code>.</li>
+        <li>Commit and push — CloudVault picks them up automatically on next load.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Step 6 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div class="step-title">Project Structure</div>
+    </div>
+    <div class="step-body">
+      <p>Here's how the project is organized:</p>
+      <div class="structure">
+<span class="folder">cloudvault/</span>
+├── <span class="file">index.html</span>         <span class="note"># Main dashboard</span>
+├── <span class="file">file.html</span>          <span class="note"># Individual file share page</span>
+├── <span class="file">setup.html</span>         <span class="note"># This guide</span>
+├── <span class="folder">css/</span>
+│   ├── <span class="file">variables.css</span>      <span class="note"># Design tokens & themes</span>
+│   ├── <span class="file">base.css</span>           <span class="note"># Reset & typography</span>
+│   ├── <span class="file">layout.css</span>         <span class="note"># Sidebar, topbar, grid</span>
+│   ├── <span class="file">components.css</span>     <span class="note"># Cards, modals, toasts</span>
+│   ├── <span class="file">animations.css</span>     <span class="note"># Motion & transitions</span>
+│   └── <span class="file">responsive.css</span>     <span class="note"># Mobile & tablet</span>
+├── <span class="folder">js/</span>
+│   ├── <span class="file">config.js</span>          <span class="note"># ← EDIT THIS</span>
+│   ├── <span class="file">utils.js</span>           <span class="note"># Helper functions</span>
+│   ├── <span class="file">fileTypes.js</span>       <span class="note"># Icons & category detection</span>
+│   ├── <span class="file">github.js</span>          <span class="note"># GitHub API integration</span>
+│   ├── <span class="file">upload.js</span>          <span class="note"># Upload drag & drop</span>
+│   ├── <span class="file">preview.js</span>         <span class="note"># File preview modal</span>
+│   ├── <span class="file">search.js</span>          <span class="note"># Search & filter engine</span>
+│   ├── <span class="file">ui.js</span>              <span class="note"># Rendering & theme</span>
+│   └── <span class="file">app.js</span>             <span class="note"># Main orchestrator</span>
+├── <span class="folder">assets/</span>
+│   └── <span class="folder">icons/</span>
+└── <span class="folder">uploads/</span>            <span class="note"># Your files live here</span>
+    ├── <span class="folder">documents/</span>
+    ├── <span class="folder">images/</span>
+    ├── <span class="folder">videos/</span>
+    ├── <span class="folder">audio/</span>
+    ├── <span class="folder">archives/</span>
+    └── <span class="folder">others/</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 7 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <div class="step-title">Custom Domain (Optional)</div>
+    </div>
+    <div class="step-body">
+      <ol>
+        <li>In your repo, go to <strong>Settings → Pages → Custom domain</strong>.</li>
+        <li>Enter your domain, e.g. <code>files.yourdomain.com</code>.</li>
+        <li>Add a <code>CNAME</code> DNS record at your registrar pointing to <code>YOUR_USERNAME.github.io</code>.</li>
+        <li>Update <code>BASE_URL</code> in <code>js/config.js</code> to <code>'https://files.yourdomain.com'</code>.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="callout success" style="margin-top:8px">
+    <i class="fa-solid fa-rocket"></i>
+    <p><strong>You're all set!</strong> Visit your GitHub Pages URL to see CloudVault live with your real files. Share any file by clicking the Copy Link or QR Code button — no login required for viewers.</p>
+  </div>
+
+  <script>
+    const saved = localStorage.getItem('theme') ? JSON.parse(localStorage.getItem('theme')) : 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+  </script>
+</body>
+</html>

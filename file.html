@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>File Preview — CloudVault</title>
+  <meta name="description" content="Preview and download a file shared via CloudVault." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml" />
+
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; background: var(--bg-base); }
+
+    .file-page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--border);
+      background: var(--topbar-bg); backdrop-filter: blur(16px);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-text { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #818cf8, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    .file-page-main {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      padding: 32px 16px; gap: 24px; max-width: 900px; margin: 0 auto; width: 100%;
+    }
+
+    .file-hero {
+      width: 100%; background: var(--surface-1); border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-lg);
+    }
+
+    .file-hero-header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+    .file-hero-icon { width: 52px; height: 52px; border-radius: 12px; background: var(--surface-3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 24px; }
+    .file-hero-info { flex: 1; min-width: 0; }
+    .file-hero-name { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); word-break: break-all; }
+    .file-hero-meta { font-size: 13px; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; }
+
+    .file-hero-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+
+    .btn-download {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; background: #6366f1; color: white; font-weight: 600;
+      border-radius: 10px; text-decoration: none; font-size: 14px;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .btn-download:hover { background: #4f46e5; transform: translateY(-1px); color: white; text-decoration: none; }
+
+    .btn-copy {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 16px; background: var(--surface-3); color: var(--text-primary);
+      border: 1px solid var(--border-md); font-weight: 600; border-radius: 10px;
+      font-size: 14px; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-copy:hover { background: var(--surface-4); }
+
+    .preview-area {
+      min-height: 300px; display: flex; align-items: center; justify-content: center;
+      background: var(--bg-base); position: relative;
+    }
+    .preview-area img { max-width: 100%; max-height: 65vh; object-fit: contain; display: block; }
+    .preview-area video { width: 100%; max-height: 65vh; background: #000; }
+    .preview-area audio { width: 100%; padding: 32px 24px; }
+    .preview-area iframe { width: 100%; height: 65vh; border: none; display: block; }
+    .preview-area pre { padding: 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-primary); white-space: pre-wrap; word-break: break-word; line-height: 1.6; width: 100%; overflow: auto; max-height: 65vh; }
+    .preview-area .no-preview { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 48px; text-align: center; }
+    .preview-area .no-preview .big-icon { font-size: 64px; }
+
+    .file-details-card {
+      width: 100%; background: var(--surface-1); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+    }
+    .details-header { padding: 14px 20px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 14px; color: var(--text-primary); }
+    .details-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0; }
+    .detail-cell { padding: 14px 20px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .detail-cell:last-child { border-right: none; }
+    .detail-cell .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--text-tertiary); margin-bottom: 4px; }
+    .detail-cell .value { font-size: 13px; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); word-break: break-all; }
+
+    .qr-card {
+      width: 100%; background: var(--surface-1); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+    .qr-box { background: white; padding: 12px; border-radius: 12px; flex-shrink: 0; }
+    .qr-info { flex: 1; min-width: 200px; }
+    .qr-info h3 { font-size: 16px; margin-bottom: 6px; }
+    .qr-info p  { font-size: 13px; color: var(--text-secondary); margin: 0; }
+
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 14px; text-decoration: none; transition: color 0.15s; }
+    .back-link:hover { color: var(--text-primary); text-decoration: none; }
+
+    .loading-placeholder { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 64px; color: var(--text-tertiary); }
+    .loader-ring { width: 36px; height: 36px; border: 3px solid var(--surface-3); border-top-color: #6366f1; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 600px) {
+      .file-hero-header { flex-wrap: wrap; }
+      .file-hero-actions { width: 100%; }
+      .btn-download, .btn-copy { flex: 1; justify-content: center; }
+      .qr-card { flex-direction: column; align-items: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="file-page-header">
+    <a href="index.html" class="logo">
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="40" height="40" rx="10" fill="url(#lg2)"/>
+        <path d="M10 26C10 22.134 13.134 19 17 19C17.34 19 17.675 19.024 18 19.071C18.622 16.71 20.812 15 23.5 15C26.538 15 29 17.462 29 20.5C29 20.667 28.99 20.832 28.971 20.994C30.18 21.478 31 22.645 31 24C31 25.657 29.657 27 28 27H12C10.895 27 10 26.105 10 25V26Z" fill="white" opacity="0.9"/>
+        <path d="M20 22V30M20 30L17 27M20 30L23 27" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs><linearGradient id="lg2" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+      </svg>
+      <span class="logo-text">CloudVault</span>
+    </a>
+    <button onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')" class="btn-copy" style="border:none">
+      <i class="fa-solid fa-moon" id="themeBtn"></i>
+    </button>
+  </header>
+
+  <main class="file-page-main" id="pageMain">
+    <div class="loading-placeholder" id="loadingEl">
+      <div class="loader-ring"></div>
+      <p>Loading file info…</p>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/fileTypes.js"></script>
+  <script>
+  (async function() {
+    // Theme
+    const theme = localStorage.getItem('theme') ? JSON.parse(localStorage.getItem('theme')) : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+
+    const params  = new URLSearchParams(location.search);
+    const path    = params.get('path');
+    const main    = document.getElementById('pageMain');
+    const loading = document.getElementById('loadingEl');
+
+    function showError(msg) {
+      loading?.remove();
+      main.innerHTML = `
+        <div style="text-align:center;padding:64px;color:var(--text-secondary)">
+          <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+          <h2 style="color:var(--text-primary);margin-bottom:8px">File not found</h2>
+          <p>${msg}</p>
+          <a href="index.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:20px;color:#6366f1">
+            <i class="fa-solid fa-arrow-left"></i> Back to CloudVault
+          </a>
+        </div>`;
+    }
+
+    if (!path) { showError('No file path specified.'); return; }
+
+    const rawUrl   = `${CONFIG.RAW_BASE}/${path}`;
+    const filename = path.split('/').pop();
+    const info     = FileTypes.getInfo(filename);
+    const ext      = Utils.getExt(filename);
+    const shareUrl = `${location.origin}${location.pathname}?path=${encodeURIComponent(path)}`;
+
+    // Determine size if possible
+    let size = 0;
+    try {
+      const head = await fetch(rawUrl, { method: 'HEAD' });
+      size = parseInt(head.headers.get('content-length') || '0', 10);
+    } catch {}
+
+    // Render page
+    loading.remove();
+
+    // Build preview HTML
+    function buildPreview() {
+      if (FileTypes.isImage(filename)) {
+        return `<img src="${rawUrl}" alt="${Utils.escapeHTML(filename)}" style="max-width:100%;max-height:65vh;object-fit:contain;display:block;margin:auto" />`;
+      }
+      if (FileTypes.isVideo(filename)) {
+        return `<video controls preload="metadata" style="width:100%;max-height:65vh;background:#000"><source src="${rawUrl}">
+          <a href="${rawUrl}" download class="btn-download" style="text-decoration:none">Download video</a></video>`;
+      }
+      if (FileTypes.isAudio(filename)) {
+        return `<div style="width:100%;padding:32px;display:flex;flex-direction:column;align-items:center;gap:16px">
+          <div style="font-size:52px"><i class="fa-solid ${info.fa}" style="color:${info.color}"></i></div>
+          <audio controls preload="metadata" style="width:100%;max-width:480px"><source src="${rawUrl}"></audio>
+        </div>`;
+      }
+      if (FileTypes.isPDF(filename)) {
+        return `<iframe src="${rawUrl}" style="width:100%;height:65vh;border:none" title="PDF Preview"></iframe>`;
+      }
+      return `<div class="no-preview">
+        <div class="big-icon"><i class="fa-solid ${info.fa}" style="color:${info.color}"></i></div>
+        <p style="color:var(--text-secondary)">No browser preview for this file type.</p>
+        <a href="${rawUrl}" download="${filename}" class="btn-download" style="text-decoration:none">
+          <i class="fa-solid fa-download"></i> Download File
+        </a>
+      </div>`;
+    }
+
+    const html = `
+      <a href="index.html" class="back-link">
+        <i class="fa-solid fa-arrow-left"></i> Back to CloudVault
+      </a>
+
+      <div class="file-hero">
+        <div class="file-hero-header">
+          <div class="file-hero-icon">
+            <i class="fa-solid ${info.fa}" style="color:${info.color}"></i>
+          </div>
+          <div class="file-hero-info">
+            <div class="file-hero-name">${Utils.escapeHTML(filename)}</div>
+            <div class="file-hero-meta">${info.label} ${size ? '· ' + Utils.formatSize(size) : ''} · ${ext.toUpperCase()}</div>
+          </div>
+          <div class="file-hero-actions">
+            <a href="${rawUrl}" download="${filename}" class="btn-download">
+              <i class="fa-solid fa-download"></i> Download
+            </a>
+            <button class="btn-copy" onclick="navigator.clipboard.writeText('${shareUrl}').then(()=>this.innerHTML='<i class=\'fa-solid fa-check\'></i> Copied!').catch(()=>{})">
+              <i class="fa-solid fa-link"></i> Copy Link
+            </button>
+          </div>
+        </div>
+        <div class="preview-area">
+          ${buildPreview()}
+        </div>
+      </div>
+
+      <div class="file-details-card">
+        <div class="details-header"><i class="fa-solid fa-circle-info" style="color:#6366f1;margin-right:8px"></i> File Details</div>
+        <div class="details-grid">
+          <div class="detail-cell"><div class="label">Name</div><div class="value">${Utils.escapeHTML(filename)}</div></div>
+          <div class="detail-cell"><div class="label">Type</div><div class="value">${info.label}</div></div>
+          <div class="detail-cell"><div class="label">Extension</div><div class="value">${ext.toUpperCase() || '—'}</div></div>
+          <div class="detail-cell"><div class="label">Size</div><div class="value">${size ? Utils.formatSize(size) : '—'}</div></div>
+          <div class="detail-cell"><div class="label">Path</div><div class="value">${Utils.escapeHTML(path)}</div></div>
+          <div class="detail-cell"><div class="label">Raw URL</div><div class="value" style="word-break:break-all"><a href="${rawUrl}" target="_blank" style="color:#818cf8">${rawUrl.slice(0,60)}…</a></div></div>
+        </div>
+      </div>
+
+      <div class="qr-card">
+        <div class="qr-box" id="qrBox"></div>
+        <div class="qr-info">
+          <h3>📱 Share via QR Code</h3>
+          <p>Scan this code with any smartphone to open or download this file directly — no account needed.</p>
+          <p style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:12px;word-break:break-all;color:var(--text-tertiary)">${shareUrl}</p>
+        </div>
+      </div>`;
+
+    main.insertAdjacentHTML('beforeend', html);
+
+    // Generate QR
+    try {
+      new QRCode(document.getElementById('qrBox'), {
+        text: shareUrl, width: 160, height: 160,
+        colorDark: '#000', colorLight: '#fff',
+        correctLevel: QRCode.CorrectLevel.M,
+      });
+    } catch {}
+
+    // If text file, fetch and display content
+    if (FileTypes.isText(filename)) {
+      try {
+        const res = await fetch(rawUrl);
+        const text = await res.text();
+        const area = document.querySelector('.preview-area');
+        if (area) {
+          area.innerHTML = `<pre><code>${Utils.escapeHTML(text)}</code></pre>`;
+        }
+      } catch {}
+    }
+
+    // Update document title
+    document.title = `${filename} — CloudVault`;
+  })();
+  </script>
+</body>
+</html>

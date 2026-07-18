@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CloudVault – Your personal GitHub-powered file cloud. Upload, organize, preview, and share files with anyone." />
+  <title>CloudVault – Personal File Cloud</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- QR Code library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SIDEBAR NAVIGATION
+  ═══════════════════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-header">
+      <a href="index.html" class="logo" aria-label="CloudVault home">
+        <div class="logo-icon">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="40" height="40" rx="10" fill="url(#logoGrad)"/>
+            <path d="M10 26C10 22.134 13.134 19 17 19C17.34 19 17.675 19.024 18 19.071C18.622 16.71 20.812 15 23.5 15C26.538 15 29 17.462 29 20.5C29 20.667 28.99 20.832 28.971 20.994C30.18 21.478 31 22.645 31 24C31 25.657 29.657 27 28 27H12C10.895 27 10 26.105 10 25V26Z" fill="white" opacity="0.9"/>
+            <path d="M20 22V30M20 30L17 27M20 30L23 27" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6366f1"/>
+                <stop offset="1" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="logo-text">CloudVault</span>
+      </a>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav-list" role="list">
+        <li><a href="#" class="nav-item active" data-filter="all" aria-current="page">
+          <i class="fa-solid fa-house"></i><span>Dashboard</span>
+          <span class="nav-badge" id="totalBadge">0</span>
+        </a></li>
+        <li><a href="#" class="nav-item" data-filter="documents">
+          <i class="fa-solid fa-file-lines"></i><span>Documents</span>
+          <span class="nav-badge" id="docsBadge">0</span>
+        </a></li>
+        <li><a href="#" class="nav-item" data-filter="images">
+          <i class="fa-solid fa-image"></i><span>Images</span>
+          <span class="nav-badge" id="imgBadge">0</span>
+        </a></li>
+        <li><a href="#" class="nav-item" data-filter="videos">
+          <i class="fa-solid fa-film"></i><span>Videos</span>
+          <span class="nav-badge" id="vidBadge">0</span>
+        </a></li>
+        <li><a href="#" class="nav-item" data-filter="audio">
+          <i class="fa-solid fa-music"></i><span>Audio</span>
+          <span class="nav-badge" id="audBadge">0</span>
+        </a></li>
+        <li><a href="#" class="nav-item" data-filter="archives">
+          <i class="fa-solid fa-file-zipper"></i><span>Archives</span>
+          <span class="nav-badge" id="archBadge">0</span>
+        </a></li>
+        <li><a href="#" class="nav-item" data-filter="others">
+          <i class="fa-solid fa-folder-open"></i><span>Others</span>
+          <span class="nav-badge" id="otherBadge">0</span>
+        </a></li>
+      </ul>
+
+      <div class="nav-divider" role="separator"></div>
+
+      <ul class="nav-list" role="list">
+        <li><a href="#" class="nav-item" id="uploadNavBtn">
+          <i class="fa-solid fa-cloud-arrow-up"></i><span>Upload Files</span>
+        </a></li>
+        <li><a href="setup.html" class="nav-item">
+          <i class="fa-solid fa-gear"></i><span>Setup Guide</span>
+        </a></li>
+      </ul>
+    </nav>
+
+    <!-- Storage used indicator -->
+    <div class="storage-meter">
+      <div class="storage-label">
+        <span>Storage Used</span>
+        <span id="storageUsed">Calculating…</span>
+      </div>
+      <div class="storage-bar" role="progressbar" aria-label="Storage used" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="storage-fill" id="storageFill"></div>
+      </div>
+      <p class="storage-note">Hosted on GitHub · No limits</p>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MAIN CONTENT AREA
+  ═══════════════════════════════════════════════════════════ -->
+  <main class="main-content" id="mainContent">
+
+    <!-- TOP BAR -->
+    <header class="topbar" role="banner">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="breadcrumb" aria-label="Current section">
+          <span id="breadcrumbText">All Files</span>
+        </div>
+      </div>
+
+      <div class="topbar-search">
+        <div class="search-wrapper" role="search">
+          <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+          <input
+            type="search"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search files by name, type, tag…"
+            aria-label="Search files"
+            autocomplete="off"
+          />
+          <kbd class="search-shortcut" aria-hidden="true">⌘K</kbd>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+        <button class="icon-btn" id="viewToggle" aria-label="Toggle grid/list view" title="Toggle view">
+          <i class="fa-solid fa-grip" id="viewIcon"></i>
+        </button>
+        <button class="btn-primary" id="uploadBtn" aria-label="Upload files">
+          <i class="fa-solid fa-plus"></i>
+          <span>Upload</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- HERO STATS BAR -->
+    <section class="stats-bar" aria-label="Storage statistics">
+      <div class="stat-card" id="stat-total">
+        <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="stat-info">
+          <span class="stat-number" id="statTotal">0</span>
+          <span class="stat-label">Total Files</span>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-size">
+        <div class="stat-icon"><i class="fa-solid fa-database"></i></div>
+        <div class="stat-info">
+          <span class="stat-number" id="statSize">0 B</span>
+          <span class="stat-label">Total Size</span>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-types">
+        <div class="stat-icon"><i class="fa-solid fa-shapes"></i></div>
+        <div class="stat-info">
+          <span class="stat-number" id="statTypes">0</span>
+          <span class="stat-label">File Types</span>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-recent">
+        <div class="stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div class="stat-info">
+          <span class="stat-number" id="statRecent">—</span>
+          <span class="stat-label">Last Upload</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOOLBAR: FILTERS + SORT -->
+    <div class="toolbar" role="toolbar" aria-label="File filters and sorting">
+      <div class="filter-chips" role="group" aria-label="Category filters">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="documents">
+          <i class="fa-solid fa-file-lines"></i> Docs
+        </button>
+        <button class="chip" data-filter="images">
+          <i class="fa-solid fa-image"></i> Images
+        </button>
+        <button class="chip" data-filter="videos">
+          <i class="fa-solid fa-film"></i> Videos
+        </button>
+        <button class="chip" data-filter="audio">
+          <i class="fa-solid fa-music"></i> Audio
+        </button>
+        <button class="chip" data-filter="archives">
+          <i class="fa-solid fa-file-zipper"></i> Archives
+        </button>
+        <button class="chip" data-filter="others">
+          <i class="fa-solid fa-folder-open"></i> Others
+        </button>
+      </div>
+
+      <div class="toolbar-right">
+        <select class="sort-select" id="sortSelect" aria-label="Sort files">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="name-asc">Name A→Z</option>
+          <option value="name-desc">Name Z→A</option>
+          <option value="size-desc">Largest First</option>
+          <option value="size-asc">Smallest First</option>
+          <option value="type">By Type</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- FILE GRID / LIST -->
+    <section class="files-section" aria-label="Files">
+      <div class="files-grid" id="filesGrid" role="list">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state hidden" id="emptyState" role="status" aria-live="polite">
+        <div class="empty-icon">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="60" cy="60" r="50" fill="var(--surface-2)" />
+            <path d="M40 75C40 68 45 62 52 60C52 55 56 51 62 51C68 51 72 55 72 60C76 61 79 64 79 68C79 72 76 75 72 75H40Z" fill="var(--surface-3)"/>
+            <path d="M60 65V75M60 75L56 71M60 75L64 71" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="empty-title" id="emptyTitle">No files yet</h2>
+        <p class="empty-desc" id="emptyDesc">Upload your first file to get started — it'll appear here automatically.</p>
+        <button class="btn-primary" id="emptyUploadBtn">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Upload Files
+        </button>
+      </div>
+
+      <!-- Loading state -->
+      <div class="loading-state" id="loadingState" role="status" aria-live="polite" aria-label="Loading files">
+        <div class="loader-ring"></div>
+        <p>Fetching files from GitHub…</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       UPLOAD MODAL
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="uploadModal" role="dialog" aria-modal="true" aria-labelledby="uploadModalTitle">
+    <div class="modal upload-modal">
+      <div class="modal-header">
+        <h2 id="uploadModalTitle"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Files</h2>
+        <button class="modal-close" id="uploadModalClose" aria-label="Close upload dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Config notice -->
+        <div class="config-notice" id="configNotice">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <div>
+            <strong>Configure GitHub first</strong>
+            <p>Open <code>js/config.js</code> and set your <code>GITHUB_OWNER</code>, <code>GITHUB_REPO</code>, and <code>GITHUB_TOKEN</code>. <a href="setup.html">Setup guide →</a></p>
+          </div>
+        </div>
+
+        <!-- Drop zone -->
+        <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Drop files here or click to browse">
+          <div class="drop-zone-inner">
+            <div class="drop-icon">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <p class="drop-title">Drop files here</p>
+            <p class="drop-sub">or <button class="link-btn" id="browseBtn">browse files</button></p>
+            <p class="drop-formats">All formats supported · Multiple files at once</p>
+          </div>
+          <input type="file" id="fileInput" multiple hidden aria-label="Select files to upload" />
+        </div>
+
+        <!-- Upload queue -->
+        <div class="upload-queue hidden" id="uploadQueue">
+          <div class="queue-header">
+            <h3>Queue (<span id="queueCount">0</span> files)</h3>
+            <button class="link-btn" id="clearQueue">Clear all</button>
+          </div>
+          <ul class="queue-list" id="queueList" role="list"></ul>
+          <div class="upload-actions">
+            <div class="category-select-wrap">
+              <label for="categorySelect">Upload to:</label>
+              <select id="categorySelect" class="sort-select">
+                <option value="auto">Auto-detect category</option>
+                <option value="documents">Documents</option>
+                <option value="images">Images</option>
+                <option value="videos">Videos</option>
+                <option value="audio">Audio</option>
+                <option value="archives">Archives</option>
+                <option value="others">Others</option>
+              </select>
+            </div>
+            <button class="btn-primary" id="startUploadBtn">
+              <i class="fa-solid fa-rocket"></i> Start Upload
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FILE PREVIEW MODAL
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
+    <div class="modal preview-modal">
+      <div class="modal-header">
+        <div class="preview-file-info">
+          <div class="preview-file-icon" id="previewFileIcon"></div>
+          <div>
+            <h2 id="previewTitle" class="preview-filename"></h2>
+            <p id="previewMeta" class="preview-meta"></p>
+          </div>
+        </div>
+        <div class="preview-actions-header">
+          <button class="icon-btn" id="previewDownload" aria-label="Download file" title="Download">
+            <i class="fa-solid fa-download"></i>
+          </button>
+          <button class="icon-btn" id="previewCopyLink" aria-label="Copy link" title="Copy link">
+            <i class="fa-solid fa-link"></i>
+          </button>
+          <button class="icon-btn" id="previewQR" aria-label="Show QR code" title="QR Code">
+            <i class="fa-solid fa-qrcode"></i>
+          </button>
+          <button class="icon-btn icon-btn-danger" id="previewDelete" aria-label="Delete file" title="Delete">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+          <button class="modal-close" id="previewModalClose" aria-label="Close preview">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="preview-body" id="previewBody">
+        <!-- Dynamic content injected by JS -->
+      </div>
+
+      <div class="preview-footer">
+        <div class="file-details-grid" id="fileDetailsGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       QR CODE MODAL
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <div class="modal qr-modal">
+      <div class="modal-header">
+        <h2 id="qrTitle">Share via QR Code</h2>
+        <button class="modal-close" id="qrModalClose" aria-label="Close QR code dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="qr-body">
+        <div id="qrCodeContainer" class="qr-container"></div>
+        <p id="qrFileName" class="qr-filename"></p>
+        <p class="qr-hint">Scan to access or download this file</p>
+        <button class="btn-secondary" id="downloadQR">
+          <i class="fa-solid fa-download"></i> Save QR Image
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       DELETE CONFIRM MODAL
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+    <div class="modal delete-modal">
+      <div class="modal-header">
+        <h2 id="deleteTitle"><i class="fa-solid fa-trash-can" style="color:var(--danger)"></i> Delete File</h2>
+        <button class="modal-close" id="deleteModalClose" aria-label="Close delete dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-warning">
+          <div class="delete-file-preview" id="deleteFilePreview"></div>
+          <p>Are you sure you want to permanently delete <strong id="deleteFileName"></strong>?</p>
+          <p class="delete-subtext">This removes the file from your GitHub repository. This action cannot be undone.</p>
+        </div>
+        <div class="delete-actions">
+          <button class="btn-secondary" id="deleteCancelBtn">Cancel</button>
+          <button class="btn-danger" id="deleteConfirmBtn">
+            <i class="fa-solid fa-trash-can"></i> Delete Permanently
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TOAST NOTIFICATIONS
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true" role="status"></div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/fileTypes.js"></script>
+  <script src="js/github.js"></script>
+  <script src="js/upload.js"></script>
+  <script src="js/preview.js"></script>
+  <script src="js/delete.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
